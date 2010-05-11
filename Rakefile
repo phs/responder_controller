@@ -5,8 +5,8 @@ begin
   require 'jeweler'
   Jeweler::Tasks.new do |gem|
     gem.name = "responder_controller"
-    gem.summary = %Q{TODO: one-line summary of your gem}
-    gem.description = %Q{TODO: longer description of your gem}
+    gem.summary = %Q{like resources_controller, but for rails 3 responders}
+    gem.description = %Q{Responders make crud controllers tiny, this wraps the rest.}
     gem.email = "phil.h.smith@gmail.com"
     gem.homepage = "http://github.com/phs/responder_controller"
     gem.authors = ["Phil Smith"]
