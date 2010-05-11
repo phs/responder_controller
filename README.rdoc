@@ -1,6 +1,10 @@
 = responder_controller
 
-Description goes here.
+Rails 3 responders wrap up as much crud controller code as possible without finding or mutating
+models on your behalf.  This is a sensible cut-off for framework support, but it still leaves a
+fair amount of duplicate code in crud controllers.  App developers are free to abstract more.
+
+This is me abstracting more for my own apps.  If it's handy for you, go nuts.
 
 == Note on Patches/Pull Requests
  
@@ -9,7 +13,8 @@ Description goes here.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
 * Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can ignore when I pull)
+  (if you want to have your own version, that is fine but bump version in a commit by itself I can
+  ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
 == Copyright
