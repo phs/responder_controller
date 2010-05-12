@@ -50,9 +50,22 @@ module ResponderController
     attr_reader :scopes
   end
 
+  # Instance methods that support the Actions module.
   module InstanceMethods
     delegate :model_class_name, :model_class, :scopes, :responds_within, :to => "self.class"
 
+    # Apply scopes to the given query.
+    #
+    # Applicable scopes come from two places.  They are either declared at the class level with
+    # .scope, or named in the request itself.  The former is good for defining topics or enforcing
+    # security, while the latter is free slicing and dicing for clients.
+    #
+    # Class-level scopes are applied first.  Request scopes come after, and are discovered by
+    # examining params.  If any params key matches a name found in #model_class.scopes.keys, then
+    # it is taken to be a scope and is applied.  The values under that params key are passed along
+    # as arguments.
+    #
+    # TODO: and if the scope taketh arguments not?
     def scope(query)
       query = (scopes || []).inject(query) do |query, scope|
         if Symbol === scope and model_class.scopes.key? scope
@@ -72,6 +85,9 @@ module ResponderController
       query
     end
 
+    # Find all models in #scope.
+    #
+    # The initial, unscoped is #model_class.all.
     def find_models
       scope model_class.all
     end
@@ -123,39 +139,54 @@ module ResponderController
     end
   end
 
+  # The seven standard restful actions.
   module Actions
+    # Find, assign and respond with models.
     def index
       self.models = find_models
       respond_with_contextual models
     end
 
+    # Find, assign and respond with a single model.
     def show
       self.model = find_model
       respond_with_contextual model
     end
 
+    # Build (but do not save), assign and respond with a new model.
+    #
+    # The new model is built from the #find_models collection, meaning it will inherit any
+    # properties implied by those scopes.
     def new
       self.model = find_models.build
       respond_with_contextual model
     end
 
+    # Find, assign and respond with a single model.
     def edit
       self.model = find_model
       respond_with_contextual model
     end
 
+    # Build, save, assign and respond with a new model.
+    #
+    # The model is created with attributes from the request params, under the #model_slug key.
     def create
       self.model = find_models.build(params[model_slug])
       model.save
       respond_with_contextual model
     end
 
+    # Find, update, assign and respond with a single model.
+    #
+    # The new attributes are taken from the request params, under the #model_slug key.
     def update
       self.model = find_model
       model.update_attributes(params[model_slug])
       respond_with_contextual model
     end
 
+    # Find and destroy a model.  Respond with #models_slug.
     def destroy
       find_model.destroy
       respond_with_contextual models_slug
