@@ -95,9 +95,9 @@ module ResponderController
 
     # Find a particular model.
     #
-    # #find_models is asked for the first model matching <tt>params[:id]</tt>.
+    # #find_models is asked find a model with <tt>params[:id]</tt>.
     def find_model
-      find_models.first(params[:id])
+      find_models.find(params[:id])
     end
 
     def model_slug

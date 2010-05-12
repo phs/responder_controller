@@ -205,10 +205,10 @@ describe "ResponderController" do
   end
 
   describe '#find_model' do
-    it 'is #find_models.find(:first, params[:id])' do
+    it 'is #find_models.find(params[:id])' do
       controller = PostsController.new
       controller.should_receive(:find_models).and_return(@query)
-      @query.should_receive(:first).with(controller.params[:id]).and_return(post = mock("the post"))
+      @query.should_receive(:find).with(controller.params[:id]).and_return(post = mock("the post"))
 
       controller.find_model.should == post
     end
