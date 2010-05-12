@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{responder_controller}
-  s.version = "0.0.0"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Phil Smith"]
-  s.date = %q{2010-05-10}
+  s.date = %q{2010-05-12}
   s.description = %q{Responders make crud controllers tiny, this wraps the rest.}
   s.email = %q{phil.h.smith@gmail.com}
   s.extra_rdoc_files = [
@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/responder_controller.rb",
+     "responder_controller.gemspec",
      "spec/responder_controller_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb"
@@ -43,11 +44,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<activesupport>, [">= 3.0.0.beta2"])
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
     else
+      s.add_dependency(%q<activesupport>, [">= 3.0.0.beta2"])
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
     end
   else
+    s.add_dependency(%q<activesupport>, [">= 3.0.0.beta2"])
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
   end
 end
