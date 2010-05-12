@@ -62,8 +62,7 @@ This is me abstracting more for my own apps.  If it's handy for you, go nuts.
 
     # Nest the comments under the post
     responds_within do |comments|
-      comment = comments.is_a?(Array) : comments.first : comments
-      comment.post
+      Post.find(params[:post_id])
     end
   end
 
