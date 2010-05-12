@@ -347,7 +347,7 @@ describe "ResponderController" do
       @controller.stub!(:find_model).and_return(@post = mock("a post"))
       @controller.stub!(:respond_with)
 
-      @posts.stub!(:new).and_return(@post)
+      @posts.stub!(:build).and_return(@post)
     end
 
     describe '#index' do
@@ -380,7 +380,7 @@ describe "ResponderController" do
 
     describe '#new' do
       it 'assigns #find_models.new to #model=' do
-        @posts.should_receive(:new).and_return(@post)
+        @posts.should_receive(:build).and_return(@post)
         @controller.new
         @controller.instance_variable_get('@post').should == @post
       end
@@ -398,7 +398,7 @@ describe "ResponderController" do
 
       it 'passes params[model_slug] to #find_models.new' do
         @controller.params[:post] = :params_to_new
-        @posts.should_receive(:new).with(:params_to_new)
+        @posts.should_receive(:build).with(:params_to_new)
         @controller.create
       end
 

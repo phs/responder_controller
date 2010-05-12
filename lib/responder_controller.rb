@@ -135,7 +135,7 @@ module ResponderController
     end
 
     def new
-      self.model = find_models.new
+      self.model = find_models.build
       respond_with_contextual model
     end
 
@@ -145,7 +145,7 @@ module ResponderController
     end
 
     def create
-      self.model = find_models.new(params[model_slug])
+      self.model = find_models.build(params[model_slug])
       model.save
       respond_with_contextual model
     end
