@@ -316,6 +316,10 @@ describe "ResponderController" do
       PostsController.children_of 'accounts/user'
     end
 
+    it "can take symbols" do
+      PostsController.children_of 'accounts/user'.to_sym
+    end
+
     it "creates a scope filtering by the parent model's foreign key as passed in params" do
       PostsController.children_of 'accounts/user'
       controller = PostsController.new

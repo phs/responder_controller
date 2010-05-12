@@ -90,7 +90,9 @@ module ResponderController
     # is a call to <tt>#responds_within</tt> declaring the parent model's modules along with the
     # parent itself, found with <tt>Accounts::User.find(params[:user_id])</tt>.
     def children_of(parent_model_class_name)
-      parent_name_parts = parent_model_class_name.underscore.split('/')
+      parent_model_class_name = parent_model_class_name.to_s.underscore
+
+      parent_name_parts = parent_model_class_name.split('/')
       parent_modules = parent_name_parts[0...-1].collect(&:to_sym)
       parent_id = "#{parent_name_parts.last}_id".to_sym
 

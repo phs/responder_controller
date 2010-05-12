@@ -66,6 +66,13 @@ This is me abstracting more for my own apps.  If it's handy for you, go nuts.
     end
   end
 
+=== The same:
+
+  class CommentsController < ApplicationController
+    include ResponderController
+    children_of :post
+  end
+
 == Note on Patches/Pull Requests
 
 * Fork the project.
