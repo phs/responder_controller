@@ -6,8 +6,69 @@ fair amount of duplicate code in crud controllers.  App developers are free to a
 
 This is me abstracting more for my own apps.  If it's handy for you, go nuts.
 
+== Example
+
+  # app/models/post.rb
+  class Post < ActiveRecord::Base
+    belongs_to :user
+
+    scope :authored_by, lambda { |user_id| where(:user_id => user_id) }
+    scope :recent, lambda { |count| order("updated_at DESC").limit(limit.to_i) }
+  end
+
+  # app/controllers/posts_controller.rb
+  class PostsController < ApplicationController
+    include ResponderController
+
+    respond_to :html, :xml, :json
+
+    # restrict to just the current user's posts
+    scope { |posts| posts.authored_by current_user.id }
+  end
+
+  # Client-side
+  GET /posts.html             # renders Post.authored_by(your_id)
+  GET /posts.html?recent=10   # renders Post.authored_by(your_id).recent(10)
+  GET /posts/1.html           # renders post 1 if it is authored by you, otherwise 404
+  PUT /posts/1.html           # update same
+  DELETE /posts/1.html        # or delete it
+
+=== Point it at a different model class:
+
+  class ProfilesController < ApplicationController
+    include ResponderController
+    serves_model :user
+  end
+
+=== Serve resources in a namespace:
+
+  class PostsController < ApplicationController
+    include ResponderController
+    responds_within 'my-blog'
+  end
+
+  # Client-side
+  GET /my-blog/posts.html
+
+=== A nested resource, using blocks for dynamic behavior:
+
+  class CommentsController < ApplicationController
+    include ResponderController
+
+    # Only get comments for the identified post
+    scope do |comments|
+      comments.where :post_id => params[:post_id]
+    end
+
+    # Nest the comments under the post
+    responds_within do |comments|
+      comment = comments.is_a?(Array) : comments.first : comments
+      comment.post
+    end
+  end
+
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
@@ -16,6 +77,10 @@ This is me abstracting more for my own apps.  If it's handy for you, go nuts.
   (if you want to have your own version, that is fine but bump version in a commit by itself I can
   ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
+
+== Thanks
+
+Thanks to SEOmoz (http://seomoz.org) for letting me build this at my desk in the afternoons instead of on the couch in the middle of the night ^_^.
 
 == Copyright
 
