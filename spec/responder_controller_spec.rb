@@ -333,7 +333,7 @@ describe "ResponderController" do
   describe '#respond_with_contextual' do
     it 'passed #responder_context to #respond_with' do
       controller = PostsController.new
-      controller.should_receive(:responder_context).with(:argument).and_return(:contextualized_argument)
+      controller.should_receive(:responder_context).with(:argument).and_return([:contextualized_argument])
       controller.should_receive(:respond_with).with(:contextualized_argument)
 
       controller.respond_with_contextual :argument

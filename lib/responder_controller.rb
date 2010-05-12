@@ -135,7 +135,7 @@ module ResponderController
     end
 
     def respond_with_contextual(model)
-      respond_with responder_context(model)
+      respond_with *responder_context(model)
     end
   end
 
