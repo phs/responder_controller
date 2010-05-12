@@ -9,11 +9,20 @@ module ResponderController
     mod.send :include, Actions
   end
 
+  # Configure how the controller finds and serves models of what flavor.
   module ClassMethods
+    # The underscored, fully-qualified name of the served model class.
+    #
+    # By default, it is the underscored controller class name, without +_controller+.
     def model_class_name
       @model_class_name || name.underscore.gsub(/_controller$/, '').singularize
     end
 
+    # Declare the underscored, fully-qualified name of the served model class.
+    #
+    # Modules are declared with separating slashes, such as in <tt>admin/setting</tt>.  Strings
+    # or symbols are accepted, but other values (including actual classes) will raise
+    # <tt>ArgumentError</tt>s.
     def serves_model(model_class_name)
       unless model_class_name.is_a? String or model_class_name.is_a? Symbol
         raise ArgumentError.new "Model must be a string or symbol"
@@ -22,6 +31,15 @@ module ResponderController
       @model_class_name = model_class_name.to_s
     end
 
+    # Declare leading arguments for +respond_with+ calls.
+    #
+    # +respond_with+ creates urls from models.  To avoid strongly coupling models to a url
+    # structure, it can take any number of leading parameters a la +polymorphic_url+.
+    # +responds_within+ declares these leading parameters, to be used on each +respond_with+ call.
+    #
+    # It takes either a varargs or a block, but not both.  In
+    # InstanceMethods#respond_with_contextual, the blocks are called with +instance_exec+, taking
+    # the model (or models) as a parameter.  They should return an array.
     def responds_within(*args, &block)
       if block and args.any?
         raise ArgumentError.new("responds_within can take arguments or a block, but not both")
@@ -32,10 +50,20 @@ module ResponderController
       @responds_within || model_class_name.split('/')[0...-1].collect { |m| m.to_sym }
     end
 
+    # The served model class, identified by #model_class_name.
     def model_class
       model_class_name.camelize.constantize
     end
 
+    # Declare a class-level scope for model collections.
+    #
+    # The model class is expected to respond to +all+, returning an Enumerable of models.
+    # Declared scopes are applied to (and replace) this collection, suitable for active record
+    # scopes.
+    #
+    # It takes one of a string, symbol or block.  Symbols and strings are called as methods on the
+    # collection without arguments.  Blocks are called with +instance_exec+ taking the current,
+    # accumulated query and returning the new, scoped one.
     def scope(*args, &block)
       scope = args.first || block
 
@@ -47,6 +75,7 @@ module ResponderController
       (@scopes ||= []) << scope
     end
 
+    # The array of declared class-level scopes, as symbols or procs.
     attr_reader :scopes
   end
 
@@ -57,7 +86,7 @@ module ResponderController
     # Apply scopes to the given query.
     #
     # Applicable scopes come from two places.  They are either declared at the class level with
-    # <tt>ClassMethods.scope</tt>, or named in the request itself.  The former is good for
+    # <tt>ClassMethods#scope</tt>, or named in the request itself.  The former is good for
     # defining topics or enforcing security, while the latter is free slicing and dicing for
     # clients.
     #
@@ -95,49 +124,68 @@ module ResponderController
 
     # Find a particular model.
     #
-    # #find_models is asked find a model with <tt>params[:id]</tt>.
+    # #find_models is asked to find a model with <tt>params[:id]</tt>.  This ensures that
+    # class-level scopes are enforced (potentially for security.)
     def find_model
       find_models.find(params[:id])
     end
 
+    # The underscored model class name, as a symbol.
+    #
+    # Model modules are omitted.
     def model_slug
       model_class_name.split('/').last.to_sym
     end
 
+    # Like #model_slug, but plural.
     def models_slug
       model_slug.to_s.pluralize.to_sym
     end
 
+    # The name of the instance variable holding a single model instance.
     def model_ivar
       "@#{model_slug}"
     end
 
+    # The name of the instance variable holding a collection of models.
     def models_ivar
       model_ivar.pluralize
     end
 
+    # Retrive #models_ivar
     def models
       instance_variable_get models_ivar
     end
 
+    # Assign #models_ivar
     def models=(models)
       instance_variable_set models_ivar, models
     end
 
+    # Retrive #model_ivar
     def model
       instance_variable_get model_ivar
     end
 
+    # Assign #model_ivar
     def model=(model)
       instance_variable_set model_ivar, model
     end
 
+    # Apply ClassMethods#responds_within to the given model (or symbol.)
+    #
+    # "Apply" just means turning +responds_within+ into an array and appending +model+ to the
+    # end.  If +responds_within+ is an array, it used directly.
+    #
+    # If it is a proc, it is called with +instance_exec+, passing +model+ in.  It should return an
+    # array, which +model+ will be appended to.  (So, don't include it in the return value.)
     def responder_context(model)
       context = responds_within
       context = instance_exec model, &context if context.is_a? Proc
       [*context] + [model]
     end
 
+    # Pass +model+ through InstanceMethods#responder_context, and pass that to #respond_with.
     def respond_with_contextual(model)
       respond_with *responder_context(model)
     end
