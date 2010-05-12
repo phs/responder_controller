@@ -31,7 +31,7 @@ module ResponderController
       @model_class_name = model_class_name.to_s
     end
 
-    # Declare leading arguments for +respond_with+ calls.
+    # Declare leading arguments ("responder context") for +respond_with+ calls.
     #
     # +respond_with+ creates urls from models.  To avoid strongly coupling models to a url
     # structure, it can take any number of leading parameters a la +polymorphic_url+.
@@ -82,6 +82,27 @@ module ResponderController
 
     # The array of declared class-level scopes, as symbols or procs.
     attr_reader :scopes
+
+    # Declare a (non-singleton) parent resource class.
+    #
+    # <tt>children_of 'accounts/user'</tt> implies a scope and some responder context.  The scope
+    # performs an ActiveRecord <tt>where :user_id => params[:user_id]</tt>.  The responder context
+    # is a call to <tt>#responds_within</tt> declaring the parent model's modules along with the
+    # parent itself, found with <tt>Accounts::User.find(params[:user_id])</tt>.
+    def children_of(parent_model_class_name)
+      parent_name_parts = parent_model_class_name.underscore.split('/')
+      parent_modules = parent_name_parts[0...-1].collect(&:to_sym)
+      parent_id = "#{parent_name_parts.last}_id".to_sym
+
+      scope do |query|
+        query.where parent_id => params[parent_id]
+      end
+
+      responds_within do
+        parent = parent_model_class_name.camelize.constantize.find params[parent_id]
+        parent_modules + [parent]
+      end
+    end
   end
 
   # Instance methods that support the Actions module.

@@ -14,6 +14,11 @@ class Post
   end
 end
 
+module Accounts
+  class User
+  end
+end
+
 module Admin
   class Setting
   end
@@ -303,6 +308,37 @@ describe "ResponderController" do
 
     after :each do
       PostsController.instance_variable_set "@responds_within", nil # clear out the garbage
+    end
+  end
+
+  describe '.children_of' do
+    it 'takes a underscored model class name' do
+      PostsController.children_of 'accounts/user'
+    end
+
+    it "creates a scope filtering by the parent model's foreign key as passed in params" do
+      PostsController.children_of 'accounts/user'
+      controller = PostsController.new
+      controller.params[:user_id] = :the_user_id
+
+      user_query = mock("user-restricted query")
+      @query.should_receive(:where).with(:user_id => :the_user_id).and_return(user_query)
+      controller.scope(@query).should == user_query
+    end
+
+    it "adds a responds_within context, of the parent modules followed by the parent itself" do
+      PostsController.children_of 'accounts/user'
+      controller = PostsController.new
+      controller.params[:user_id] = :the_user_id
+
+      Accounts::User.should_receive(:find).with(:the_user_id).and_return(user = mock("the user"))
+
+      controller.responder_context(:argument).should == [:accounts, user, :argument]
+    end
+
+    after :each do
+      PostsController.instance_variable_set "@responds_within", nil # clear out the garbage
+      PostsController.scopes.clear
     end
   end
 
