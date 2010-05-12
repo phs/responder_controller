@@ -43,10 +43,15 @@ module ResponderController
     def responds_within(*args, &block)
       if block and args.any?
         raise ArgumentError.new("responds_within can take arguments or a block, but not both")
+      elsif block or args.any?
+        @responds_within ||= []
+        if not args.empty?
+          @responds_within.concat args
+        else
+          @responds_within << block
+        end
       end
 
-      @responds_within = args unless args.empty?
-      @responds_within = block if block
       @responds_within || model_class_name.split('/')[0...-1].collect { |m| m.to_sym }
     end
 
@@ -180,9 +185,10 @@ module ResponderController
     # If it is a proc, it is called with +instance_exec+, passing +model+ in.  It should return an
     # array, which +model+ will be appended to.  (So, don't include it in the return value.)
     def responder_context(model)
-      context = responds_within
-      context = instance_exec model, &context if context.is_a? Proc
-      [*context] + [model]
+      context = responds_within.collect do |o|
+        o = instance_exec model, &o if o.is_a? Proc
+        o
+      end.flatten + [model]
     end
 
     # Pass +model+ through InstanceMethods#responder_context, and pass that to #respond_with.

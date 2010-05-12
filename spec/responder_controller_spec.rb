@@ -273,7 +273,7 @@ describe "ResponderController" do
   end
 
   describe '.responds_within' do
-    it "is an array of the model's enclosing module names as symbols by default" do
+    it "contains the model's enclosing module names as symbols by default" do
       PostsController.responds_within.should == []
       Admin::SettingsController.responds_within.should == [:admin]
     end
@@ -283,10 +283,16 @@ describe "ResponderController" do
       PostsController.responds_within.should == [:foo, :bar, :baz]
     end
 
-    it "can take, save and return a block instead" do
+    it "accumulates between calls" do
+      PostsController.responds_within(:foo).should == [:foo]
+      PostsController.responds_within(:bar, :baz).should == [:foo, :bar, :baz]
+      PostsController.responds_within.should == [:foo, :bar, :baz]
+    end
+
+    it "can take a block instead" do
       block = lambda {}
-      PostsController.responds_within(&block).should == block
-      PostsController.responds_within.should == block
+      PostsController.responds_within(&block).should == [block]
+      PostsController.responds_within.should == [block]
     end
 
     it "whines if both positional arguments and a block are passed" do
