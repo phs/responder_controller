@@ -1,3 +1,7 @@
+*ResponderController 0.1.2*
+
+* If a requested scope errors out, raise a BadScope exception.  Tell rails (if present) to render these as 422s.
+
 *ResponderController 0.1.1*
 
 * Use AR#scoped instead of #all to create initial query, as #all gives a literal array (whoops.)
