@@ -199,10 +199,10 @@ describe "ResponderController" do
   end
 
   describe '#find_models' do
-    it 'is #scope #model_class.find(:all)' do
+    it 'is #scope #model_class.scoped' do
       controller = PostsController.new
 
-      Post.should_receive(:all).and_return(@query)
+      Post.should_receive(:scoped).and_return(@query)
       controller.should_receive(:scope).with(@query).and_return(@query)
 
       controller.find_models.should == @query

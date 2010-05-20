@@ -145,9 +145,9 @@ module ResponderController
 
     # Find all models in #scope.
     #
-    # The initial, unscoped is <tt>ClassMethods#model_class.all</tt>.
+    # The initial query is <tt>ClassMethods#model_class.scoped</tt>.
     def find_models
-      scope model_class.all
+      scope model_class.scoped
     end
 
     # Find a particular model.
