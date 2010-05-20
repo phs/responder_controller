@@ -122,8 +122,6 @@ module ResponderController
     # examining +params+.  If any +params+ key matches a name found in
     # <tt>ClassMethods#model_class.scopes.keys</tt>, then it is taken to be a scope and is
     # applied.  The values under that +params+ key are passed along as arguments.
-    #
-    # TODO: and if the scope taketh arguments not?
     def scope(query)
       query = (scopes || []).inject(query) do |query, scope|
         if Symbol === scope and model_class.scopes.key? scope
