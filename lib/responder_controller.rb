@@ -3,10 +3,18 @@ require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/module/delegation'
 
 module ResponderController
+  class BadScope < StandardError
+  end
+
   def self.included(mod)
     mod.extend ClassMethods
     mod.send :include, InstanceMethods
     mod.send :include, Actions
+
+    # Uncaught BadScope exceptions become 422s
+    if defined? ActionDispatch
+      ActionDispatch::ShowExceptions.rescue_responses[BadScope.name] = :unprocessable_entity
+    end
   end
 
   # Configure how the controller finds and serves models of what flavor.
@@ -135,7 +143,7 @@ module ResponderController
 
       scopes_from_request = (model_class.scopes.keys & params.keys.collect { |k| k.to_sym })
       query = scopes_from_request.inject(query) do |query, scope|
-        query.send scope, *params[scope.to_s]
+        query.send scope, *params[scope.to_s] rescue raise BadScope.new
       end
 
       query

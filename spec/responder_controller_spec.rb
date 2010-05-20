@@ -196,6 +196,13 @@ describe "ResponderController" do
       class_level_query.should_receive(:commented_on_by).with('you').and_return(class_level_query)
       @controller.scope(@query).should == class_level_query
     end
+
+    it 'throws BadScope for scopes that raise an exception' do
+      @query.should_receive(:commented_on_by).and_raise(ArgumentError.new)
+      lambda do
+        @controller.scope @query
+      end.should raise_error(ResponderController::BadScope)
+    end
   end
 
   describe '#find_models' do
