@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{responder_controller}
-  s.version = "0.1.0"
+  s.version = "0.1.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Phil Smith"]
-  s.date = %q{2010-05-12}
+  s.date = %q{2010-05-19}
   s.description = %q{Responders make crud controllers tiny, this wraps the rest.}
   s.email = %q{phil.h.smith@gmail.com}
   s.extra_rdoc_files = [
@@ -19,6 +19,7 @@ Gem::Specification.new do |s|
   s.files = [
     ".document",
      ".gitignore",
+     "CHANGELOG",
      "LICENSE",
      "README.rdoc",
      "Rakefile",
