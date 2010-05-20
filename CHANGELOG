@@ -1,0 +1,3 @@
+*ResponderController 0.1.1*
+
+* Use AR#scoped instead of #all to create initial query, as #all gives a literal array (whoops.)
