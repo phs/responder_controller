@@ -11,9 +11,9 @@ module ResponderController
     mod.send :include, InstanceMethods
     mod.send :include, Actions
 
-    # Uncaught BadScope exceptions become 422s
+    # Uncaught BadScope exceptions become 400s
     if defined? ActionDispatch
-      ActionDispatch::ShowExceptions.rescue_responses[BadScope.name] = :unprocessable_entity
+      ActionDispatch::ShowExceptions.rescue_responses[BadScope.name] = :bad_request
     end
   end
 
