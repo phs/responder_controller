@@ -1,3 +1,9 @@
+*ResponderController 0.2.0*
+
+* Added .serves_scopes, which takes :only and :except options to restrict the list of active
+  record scopes that #index will serve.  If a forbidden scope is requested, ForbiddenScope will be
+  raised, which will render as a 403 if uncaught.
+
 *ResponderController 0.1.3*
 
 * Render BadScopes as 400s, not 422s
