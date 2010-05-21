@@ -7,12 +7,14 @@ module ResponderController
   class ScopeError < StandardError
   end
 
-  # Raised when an active record scope itself raises an exception
+  # Raised when an active record scope itself raises an exception.
+  #
   # If this exception bubbles up, rails will render it as a 400.
   class BadScope < ScopeError
   end
 
-  # Raised when attempting to call a scope forbidden by .serves_scopes.
+  # Raised when attempting to call a scope forbidden by ClassMethods.serves_scopes.
+  #
   # If this exception bubbles up, rails will render it as a 403.
   class ForbiddenScope < ScopeError
   end

@@ -40,6 +40,20 @@ This is me abstracting more for my own apps.  If it's handy for you, go nuts.
     serves_model :user
   end
 
+=== Forbid a certain scope
+
+  class PostsController < ApplicationController
+    include ResponderController
+    serves_scopes :except => :authored_by # asking for it will 403
+  end
+
+=== Or use a white list instead
+
+  class PostsController < ApplicationController
+    include ResponderController
+    serves_scopes :only => :recent
+  end
+
 === Serve resources in a namespace:
 
   class PostsController < ApplicationController
