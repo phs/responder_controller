@@ -3,7 +3,18 @@ require 'active_support/core_ext/string/inflections'
 require 'active_support/core_ext/module/delegation'
 
 module ResponderController
-  class BadScope < StandardError
+  # Root of scope-related exceptions.
+  class ScopeError < StandardError
+  end
+
+  # Raised when an active record scope itself raises an exception
+  # If this exception bubbles up, rails will render it as a 400.
+  class BadScope < ScopeError
+  end
+
+  # Raised when attempting to call a scope forbidden by .serves_scopes.
+  # If this exception bubbles up, rails will render it as a 403.
+  class ForbiddenScope < ScopeError
   end
 
   def self.included(mod)
@@ -11,10 +22,11 @@ module ResponderController
     mod.send :include, InstanceMethods
     mod.send :include, Actions
 
-    # Uncaught BadScope exceptions become 400s
-    if defined? ActionDispatch
-      ActionDispatch::ShowExceptions.rescue_responses[BadScope.name] = :bad_request
-    end
+    # Declare http statuses to return for uncaught scope errors.
+    ActionDispatch::ShowExceptions.rescue_responses.update({
+      BadScope.name => :bad_request,
+      ForbiddenScope.name => :forbidden
+    }) if defined? ActionDispatch
   end
 
   # Configure how the controller finds and serves models of what flavor.
@@ -37,6 +49,33 @@ module ResponderController
       end
 
       @model_class_name = model_class_name.to_s
+    end
+
+    # Declare what active record scopes to allow or forbid to requests.
+    #
+    # .serves_scopes follows the regular :only/:except form:  white-listed scopes are passed by
+    # name as <tt>:only => [:allowed, :scopes]</tt> or <tt>:only => :just_one</tt>.  Similarly,
+    # black-listed ones are passed under <tt>:except</tt>.
+    #
+    # If a white-list is passed, all other requested scopes (i.e. scopes named by query parameters)
+    # will be denied, raising <tt>ForbiddenScope</tt>.  If a black-list is passed, only they will
+    # raise the exception.
+    def serves_scopes(options = nil)
+      @scopes_served ||= {}
+
+      if options
+        raise TypeError unless options.is_a? Hash
+
+        new_keys = @scopes_served.keys | options.keys
+        unless new_keys == [:only] or new_keys == [:except]
+          raise ArgumentError.new("serves_scopes takes exactly one of :only and :except")
+        end
+
+        @scopes_served[options.keys.first] ||= []
+        @scopes_served[options.keys.first].concat [*options.values.first]
+      end
+
+      @scopes_served
     end
 
     # Declare leading arguments ("responder context") for +respond_with+ calls.
@@ -102,7 +141,7 @@ module ResponderController
 
       parent_name_parts = parent_model_class_name.split('/')
       parent_modules = parent_name_parts[0...-1].collect(&:to_sym)
-      parent_id = "#{parent_name_parts.last}_id".to_sym
+      parent_id = "#{parent_name_parts.last}_id".to_sym # TODO: primary key
 
       scope do |query|
         query.where parent_id => params[parent_id]
@@ -117,7 +156,8 @@ module ResponderController
 
   # Instance methods that support the Actions module.
   module InstanceMethods
-    delegate :model_class_name, :model_class, :scopes, :responds_within, :to => "self.class"
+    delegate :model_class_name, :model_class, :scopes, :responds_within, :serves_scopes,
+      :to => "self.class"
 
     # Apply scopes to the given query.
     #
@@ -141,9 +181,12 @@ module ResponderController
         end
       end
 
-      scopes_from_request = (model_class.scopes.keys & params.keys.collect { |k| k.to_sym })
-      query = scopes_from_request.inject(query) do |query, scope|
-        query.send scope, *params[scope.to_s] rescue raise BadScope.new
+      requested = (model_class.scopes.keys & params.keys.collect { |k| k.to_sym })
+      raise ForbiddenScope if serves_scopes[:only] && (requested - serves_scopes[:only]).any?
+      raise ForbiddenScope if serves_scopes[:except] && (requested & serves_scopes[:except]).any?
+
+      query = requested.inject(query) do |query, scope|
+        query.send scope, *params[scope.to_s] rescue raise BadScope
       end
 
       query

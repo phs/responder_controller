@@ -205,6 +205,76 @@ describe "ResponderController" do
     end
   end
 
+  describe '.serves_scopes' do
+    before :each do
+      @controller = PostsController.new
+      @controller.params['commented_on_by'] = 'you'
+    end
+
+    it 'can specify a white list of active record scopes to serve' do
+      PostsController.serves_scopes :only => [:recent, :authored_by, :published_after]
+      lambda do
+        @controller.scope @query
+      end.should raise_error(ResponderController::ForbiddenScope)
+    end
+
+    it 'can specify just one scope to white list' do
+      PostsController.serves_scopes :only => :recent
+      lambda do
+        @controller.scope @query
+      end.should raise_error(ResponderController::ForbiddenScope)
+    end
+
+    it 'can specify a black list of active record scopes to deny' do
+      PostsController.serves_scopes :except => [:commented_on_by, :unpublished]
+      lambda do
+        @controller.scope @query
+      end.should raise_error(ResponderController::ForbiddenScope)
+    end
+
+    it 'can specify just one scope to black list' do
+      PostsController.serves_scopes :except => :commented_on_by
+      lambda do
+        @controller.scope @query
+      end.should raise_error(ResponderController::ForbiddenScope)
+    end
+
+    it 'whines if passed anything other than a hash' do
+      lambda do
+        PostsController.serves_scopes 'cupcakes!'
+      end.should raise_error TypeError
+    end
+
+    it 'whines about keys other than :only and :except' do
+      lambda do
+        PostsController.serves_scopes 'only' => :recent
+      end.should raise_error ArgumentError
+    end
+
+    it 'whines when both :only and :except are passed' do
+      lambda do
+        PostsController.serves_scopes :only => :recent, :except => :commented_on_by
+      end.should raise_error ArgumentError
+    end
+
+    it 'whines if both :only and :except are passed between different calls' do
+      PostsController.serves_scopes :only => :recent
+      lambda do
+        PostsController.serves_scopes :except => :commented_on_by
+      end.should raise_error ArgumentError
+    end
+
+    it 'accumulates scopes passed over multiple calls' do
+      PostsController.serves_scopes :only => :recent
+      PostsController.serves_scopes :only => :authored_by
+      PostsController.serves_scopes[:only].should == [:recent, :authored_by]
+    end
+
+    after :each do
+      PostsController.serves_scopes.clear # clean up
+    end
+  end
+
   describe '#find_models' do
     it 'is #scope #model_class.scoped' do
       controller = PostsController.new
