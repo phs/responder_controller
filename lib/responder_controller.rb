@@ -63,21 +63,21 @@ module ResponderController
     # will be denied, raising <tt>ForbiddenScope</tt>.  If a black-list is passed, only they will
     # raise the exception.
     def serves_scopes(options = nil)
-      @scopes_served ||= {}
+      @serves_scopes ||= {}
 
       if options
         raise TypeError unless options.is_a? Hash
 
-        new_keys = @scopes_served.keys | options.keys
+        new_keys = @serves_scopes.keys | options.keys
         unless new_keys == [:only] or new_keys == [:except]
           raise ArgumentError.new("serves_scopes takes exactly one of :only and :except")
         end
 
-        @scopes_served[options.keys.first] ||= []
-        @scopes_served[options.keys.first].concat [*options.values.first]
+        @serves_scopes[options.keys.first] ||= []
+        @serves_scopes[options.keys.first].concat [*options.values.first]
       end
 
-      @scopes_served
+      @serves_scopes
     end
 
     # Declare leading arguments ("responder context") for +respond_with+ calls.
