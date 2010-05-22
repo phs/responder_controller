@@ -25,6 +25,9 @@ Gem::Specification.new do |s|
      "Rakefile",
      "VERSION",
      "lib/responder_controller.rb",
+     "lib/responder_controller/actions.rb",
+     "lib/responder_controller/class_methods.rb",
+     "lib/responder_controller/instance_methods.rb",
      "responder_controller.gemspec",
      "spec/responder_controller_spec.rb",
      "spec/spec.opts",
@@ -45,14 +48,14 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::RubyGemsVersion) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<activesupport>, [">= 3.0.0.beta2"])
+      s.add_runtime_dependency(%q<activesupport>, [">= 3.0.0.beta3"])
       s.add_development_dependency(%q<rspec>, [">= 1.2.9"])
     else
-      s.add_dependency(%q<activesupport>, [">= 3.0.0.beta2"])
+      s.add_dependency(%q<activesupport>, [">= 3.0.0.beta3"])
       s.add_dependency(%q<rspec>, [">= 1.2.9"])
     end
   else
-    s.add_dependency(%q<activesupport>, [">= 3.0.0.beta2"])
+    s.add_dependency(%q<activesupport>, [">= 3.0.0.beta3"])
     s.add_dependency(%q<rspec>, [">= 1.2.9"])
   end
 end
