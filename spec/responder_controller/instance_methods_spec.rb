@@ -14,11 +14,6 @@ class Post
   end
 end
 
-module Admin
-  class Setting
-  end
-end
-
 describe ResponderController::InstanceMethods do
 
   class ApplicationController
