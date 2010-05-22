@@ -1,3 +1,9 @@
+*ResponderController 0.3.0*
+
+* Broke modules out into separate files.
+* Actions#index calls #to_a on @models before passing to #respond_with.  This makes rails
+  3.0.0beta3 happy: otherwise "object references itself" errors would occur in the json encoder.
+
 *ResponderController 0.2.0*
 
 * Added .serves_scopes, which takes :only and :except options to restrict the list of active
