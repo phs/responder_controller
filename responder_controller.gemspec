@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{responder_controller}
-  s.version = "0.2.0"
+  s.version = "0.3.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Phil Smith"]
@@ -29,6 +29,9 @@ Gem::Specification.new do |s|
      "lib/responder_controller/class_methods.rb",
      "lib/responder_controller/instance_methods.rb",
      "responder_controller.gemspec",
+     "spec/responder_controller/actions_spec.rb",
+     "spec/responder_controller/class_methods_spec.rb",
+     "spec/responder_controller/instance_methods_spec.rb",
      "spec/responder_controller_spec.rb",
      "spec/spec.opts",
      "spec/spec_helper.rb"
@@ -39,7 +42,10 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.6}
   s.summary = %q{like resources_controller, but for rails 3 responders}
   s.test_files = [
-    "spec/responder_controller_spec.rb",
+    "spec/responder_controller/actions_spec.rb",
+     "spec/responder_controller/class_methods_spec.rb",
+     "spec/responder_controller/instance_methods_spec.rb",
+     "spec/responder_controller_spec.rb",
      "spec/spec_helper.rb"
   ]
 
