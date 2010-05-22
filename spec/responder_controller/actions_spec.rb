@@ -21,6 +21,7 @@ describe ResponderController do
       @controller.stub!(:respond_with)
 
       @posts.stub!(:build).and_return(@post)
+      @posts.stub!(:to_a).and_return([])
     end
 
     describe '#index' do
@@ -30,8 +31,9 @@ describe ResponderController do
         @controller.instance_variable_get('@posts').should == @posts
       end
 
-      it '#respond_with_contextual @models' do
-        @controller.should_receive(:respond_with_contextual).with(@posts)
+      it '#respond_with_contextual @models.to_a' do
+        @posts.should_receive(:to_a).and_return(:posts_array)
+        @controller.should_receive(:respond_with_contextual).with(:posts_array)
         @controller.index
       end
     end

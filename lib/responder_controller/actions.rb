@@ -1,10 +1,10 @@
 module ResponderController
   # The seven standard restful actions.
   module Actions
-    # Find, assign and respond with models.
+    # Find, assign and respond with models.to_a.
     def index
       self.models = find_models
-      respond_with_contextual models
+      respond_with_contextual models.to_a
     end
 
     # Find, assign and respond with a single model.
