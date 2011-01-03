@@ -51,7 +51,9 @@ module ResponderController
     # #find_models is asked to find a model with <tt>params[:id]</tt>.  This ensures that
     # class-level scopes are enforced (potentially for security.)
     def find_model
-      find_models.find(params[:id])
+      models = find_models
+      finder = models.respond_to?(:from_param) ? :from_param : :find
+      models.send finder, params[:id]
     end
 
     # The underscored model class name, as a symbol.

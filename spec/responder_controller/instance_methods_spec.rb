@@ -128,15 +128,30 @@ describe ResponderController::InstanceMethods do
   end
 
   describe '#find_model' do
-    it 'is #from_param(params[:id]) if #find_models responds to it'
+    before :each do
+      @post = mock("the post")
+      @query.stub!(:respond_to?).with(:from_param).and_return(false)
+    end
+
+    it 'is #from_param(params[:id]) if #find_models responds to it' do
+      @controller.should_receive(:find_models).and_return(@query)
+
+      @query.should_receive(:respond_to?).with(:from_param).and_return(true)
+      @query.should_receive(:from_param).
+        with(@controller.params[:id]).
+        and_return(@post)
+
+      @controller.find_model.should == @post
+    end
 
     it 'is #find_models.find(params[:id]) otherwise' do
       @controller.should_receive(:find_models).and_return(@query)
+
       @query.should_receive(:find).
         with(@controller.params[:id]).
-        and_return(post = mock("the post"))
+        and_return(@post)
 
-      @controller.find_model.should == post
+      @controller.find_model.should == @post
     end
   end
 
