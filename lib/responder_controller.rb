@@ -16,7 +16,8 @@ module ResponderController
   class BadScope < ScopeError
   end
 
-  # Raised when attempting to call a scope forbidden by ClassMethods.serves_scopes.
+  # Raised when attempting to call a scope forbidden by
+  # ClassMethods.serves_scopes.
   #
   # If this exception bubbles up, rails will render it as a 403.
   class ForbiddenScope < ScopeError

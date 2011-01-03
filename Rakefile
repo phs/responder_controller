@@ -6,17 +6,20 @@ begin
   Jeweler::Tasks.new do |gem|
     gem.name = "responder_controller"
     gem.summary = %Q{like resources_controller, but for rails 3 responders}
-    gem.description = %Q{Responders make crud controllers tiny, this wraps the rest.}
+    gem.description =
+      %Q{Responders make crud controllers tiny, this wraps the rest.}
     gem.email = "phil.h.smith@gmail.com"
     gem.homepage = "http://github.com/phs/responder_controller"
     gem.authors = ["Phil Smith"]
     gem.add_dependency "activesupport", ">= 3.0.0.beta3"
     gem.add_development_dependency "rspec", ">= 1.2.9"
-    # gem is a Gem::Specification... see http://www.rubygems.org/read/chapter/20 for additional settings
+    # gem is a Gem::Specification...
+    # see http://www.rubygems.org/read/chapter/20 for additional settings
   end
   Jeweler::GemcutterTasks.new
 rescue LoadError
-  puts "Jeweler (or a dependency) not available. Install it with: gem install jeweler"
+  puts "Jeweler (or a dependency) not available. " \
+    "Install it with: gem install jeweler"
 end
 
 require 'spec/rake/spectask'

@@ -1,8 +1,9 @@
 = responder_controller
 
-Rails 3 responders wrap up as much crud controller code as possible without finding or mutating
-models on your behalf.  This is a sensible cut-off for framework support, but it still leaves a
-fair amount of duplicate code in crud controllers.  App developers are free to abstract more.
+Rails 3 responders wrap up as much crud controller code as possible without
+finding or mutating models on your behalf.  This is a sensible cut-off for
+framework support, but it still leaves a fair amount of duplicate code in crud
+controllers.  App developers are free to abstract more.
 
 This is me abstracting more for my own apps.  If it's handy for you, go nuts.
 
@@ -13,7 +14,7 @@ This is me abstracting more for my own apps.  If it's handy for you, go nuts.
     belongs_to :user
 
     scope :authored_by, lambda { |user_id| where(:user_id => user_id) }
-    scope :recent, lambda { |count| order("updated_at DESC").limit(limit.to_i) }
+    scope :recent, lambda { |num| order("updated_at DESC").limit(num.to_i) }
   end
 
   # app/controllers/posts_controller.rb
@@ -29,7 +30,7 @@ This is me abstracting more for my own apps.  If it's handy for you, go nuts.
   # Client-side
   GET /posts.html             # renders Post.authored_by(your_id)
   GET /posts.html?recent=10   # renders Post.authored_by(your_id).recent(10)
-  GET /posts/1.html           # renders post 1 if it is authored by you, otherwise 404
+  GET /posts/1.html           # renders post 1 if you authored it, or 404
   PUT /posts/1.html           # update same
   DELETE /posts/1.html        # or delete it
 
@@ -94,13 +95,14 @@ This is me abstracting more for my own apps.  If it's handy for you, go nuts.
 * Add tests for it. This is important so I don't break it in a
   future version unintentionally.
 * Commit, do not mess with rakefile, version, or history.
-  (if you want to have your own version, that is fine but bump version in a commit by itself I can
-  ignore when I pull)
+  (if you want to have your own version, that is fine but bump version in a
+  commit by itself I can ignore when I pull)
 * Send me a pull request. Bonus points for topic branches.
 
 == Thanks
 
-Thanks to SEOmoz (http://seomoz.org) for letting me build this at my desk in the afternoons instead of on the couch in the middle of the night ^_^.
+Thanks to SEOmoz (http://seomoz.org) for letting me build this at my desk in
+the afternoons instead of on the couch in the middle of the night ^_^.
 
 == Copyright
 

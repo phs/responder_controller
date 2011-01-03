@@ -1,14 +1,16 @@
 *ResponderController 0.3.0*
 
 * Broke modules out into separate files.
-* Actions#index calls #to_a on @models before passing to #respond_with.  This makes rails
-  3.0.0beta3 happy: otherwise "object references itself" errors would occur in the json encoder.
+* Actions#index calls #to_a on @models before passing to #respond_with.  This
+  makes rails 3.0.0beta3 happy: otherwise "object references itself" errors
+  would occur in the json encoder.
 
 *ResponderController 0.2.0*
 
-* Added .serves_scopes, which takes :only and :except options to restrict the list of active
-  record scopes that #index will serve.  If a forbidden scope is requested, ForbiddenScope will be
-  raised, which will render as a 403 if uncaught.
+* Added .serves_scopes, which takes :only and :except options to restrict the
+  list of active record scopes that #index will serve.  If a forbidden scope
+  is requested, ForbiddenScope will be raised, which will render as a 403 if
+  uncaught.
 
 *ResponderController 0.1.3*
 
@@ -16,8 +18,10 @@
 
 *ResponderController 0.1.2*
 
-* If a requested scope errors out, raise a BadScope exception.  Tell rails (if present) to render these as 422s.
+* If a requested scope errors out, raise a BadScope exception.  Tell rails (if
+  present) to render these as 422s.
 
 *ResponderController 0.1.1*
 
-* Use AR#scoped instead of #all to create initial query, as #all gives a literal array (whoops.)
+* Use AR#scoped instead of #all to create initial query, as #all gives a
+  literal array (whoops.)

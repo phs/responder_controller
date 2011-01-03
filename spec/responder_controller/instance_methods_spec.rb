@@ -62,7 +62,7 @@ describe ResponderController::InstanceMethods do
       @controller.scope(@query).should == @query
     end
 
-    it "with explicit scopes asks model_class for the declared scopes in order" do
+    it "sends explicit, declared scopes to the query in order" do
       PostsController.scope :unpublished
       PostsController.scope :recent
 
@@ -71,7 +71,7 @@ describe ResponderController::InstanceMethods do
       @controller.scope(@query).should == @query
     end
 
-    it 'with a block scope instance_execs the block while passing in the current query' do
+    it '#instance_execs block scopes, passing in the query' do
       PostsController.scope do |posts|
         posts.owned_by(params[:user_id])
       end
@@ -102,10 +102,13 @@ describe ResponderController::InstanceMethods do
       end
 
       it 'is applied after class-level scopes' do
+        # owned_by is the last class-level scope
         class_level_query = mock("class-level scoped query")
-        @query.should_receive(:owned_by).and_return(class_level_query) # last class-level scope
+        @query.should_receive(:owned_by).and_return(class_level_query)
 
-        class_level_query.should_receive(:commented_on_by).with('you').and_return(class_level_query)
+        class_level_query.should_receive(:commented_on_by).
+          with('you').and_return(class_level_query)
+
         @controller.scope(@query).should == class_level_query
       end
 
@@ -221,21 +224,24 @@ describe ResponderController::InstanceMethods do
 
   describe '#responder_context' do
     it "is the argument prepended with responds_within" do
-      Admin::SettingsController.new.responder_context(:argument).should == [:admin, :argument]
+      Admin::SettingsController.new.responder_context(:argument).should == [
+        :admin, :argument]
     end
 
-    it "passes the argument to responds_within and prepends the result if it is a lambda" do
+    it "passes lambdas to responds_within and prepends the results" do
       Admin::SettingsController.responds_within do |model|
         model.should == :argument
         [:nested, :namespace]
       end
 
-      Admin::SettingsController.new.responder_context(:argument).should == [:nested, :namespace, :argument]
+      Admin::SettingsController.new.responder_context(:argument).should == [
+          :nested, :namespace, :argument]
     end
 
     it "wraps the lambda result in an array if needed" do
       Admin::SettingsController.responds_within { |model| :namespace }
-      Admin::SettingsController.new.responder_context(:argument).should == [:namespace, :argument]
+      Admin::SettingsController.new.responder_context(:argument).should == [
+        :namespace, :argument]
     end
 
     after :each do
@@ -245,7 +251,8 @@ describe ResponderController::InstanceMethods do
 
   describe '#respond_with_contextual' do
     it 'passed #responder_context to #respond_with' do
-      @controller.should_receive(:responder_context).with(:argument).and_return([:contextualized_argument])
+      @controller.should_receive(:responder_context).
+        with(:argument).and_return([:contextualized_argument])
       @controller.should_receive(:respond_with).with(:contextualized_argument)
 
       @controller.respond_with_contextual :argument

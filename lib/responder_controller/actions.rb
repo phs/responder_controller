@@ -15,8 +15,9 @@ module ResponderController
 
     # Build (but do not save), assign and respond with a new model.
     #
-    # The new model is built from the <tt>InstanceMethods#find_models</tt> collection, meaning it
-    # could inherit any properties implied by those scopes.
+    # The new model is built from the <tt>InstanceMethods#find_models</tt>
+    # collection, meaning it could inherit any properties implied by those
+    # scopes.
     def new
       self.model = find_models.build
       respond_with_contextual model
@@ -48,7 +49,8 @@ module ResponderController
       respond_with_contextual model
     end
 
-    # Find and destroy a model.  Respond with <tt>InstanceMethods#models_slug</tt>.
+    # Find and destroy a model.  Respond with
+    # <tt>InstanceMethods#models_slug</tt>.
     def destroy
       find_model.destroy
       respond_with_contextual models_slug

@@ -32,8 +32,8 @@ describe ResponderController do
       end
 
       it '#respond_with_contextual @models.to_a' do
-        @posts.should_receive(:to_a).and_return(:posts_array)
-        @controller.should_receive(:respond_with_contextual).with(:posts_array)
+        @posts.should_receive(:to_a).and_return(:posts)
+        @controller.should_receive(:respond_with_contextual).with(:posts)
         @controller.index
       end
     end

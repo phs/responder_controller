@@ -132,7 +132,9 @@ describe ResponderController::ClassMethods do
     end
 
     it 'can specify a white list of active record scopes to serve' do
-      PostsController.serves_scopes :only => [:recent, :authored_by, :published_after]
+      PostsController.serves_scopes :only => [
+        :recent, :authored_by, :published_after]
+
       lambda do
         @controller.scope @query
       end.should raise_error(ResponderController::ForbiddenScope)
@@ -146,7 +148,9 @@ describe ResponderController::ClassMethods do
     end
 
     it 'can specify a black list of active record scopes to deny' do
-      PostsController.serves_scopes :except => [:commented_on_by, :unpublished]
+      PostsController.serves_scopes :except => [
+        :commented_on_by, :unpublished]
+
       lambda do
         @controller.scope @query
       end.should raise_error(ResponderController::ForbiddenScope)
@@ -173,11 +177,12 @@ describe ResponderController::ClassMethods do
 
     it 'whines when both :only and :except are passed' do
       lambda do
-        PostsController.serves_scopes :only => :recent, :except => :commented_on_by
+        PostsController.serves_scopes :only => :recent,
+          :except => :commented_on_by
       end.should raise_error ArgumentError
     end
 
-    it 'whines if both :only and :except are passed between different calls' do
+    it 'whines if :only and :except are passed between different calls' do
       PostsController.serves_scopes :only => :recent
       lambda do
         PostsController.serves_scopes :except => :commented_on_by
@@ -202,7 +207,8 @@ describe ResponderController::ClassMethods do
     end
 
     it "takes, saves and returns a varargs" do
-      PostsController.responds_within(:foo, :bar, :baz).should == [:foo, :bar, :baz]
+      PostsController.responds_within(:foo, :bar, :baz).should == \
+        [:foo, :bar, :baz]
       PostsController.responds_within.should == [:foo, :bar, :baz]
     end
 
@@ -225,7 +231,8 @@ describe ResponderController::ClassMethods do
     end
 
     after :each do
-      PostsController.instance_variable_set "@responds_within", nil # clear out the garbage
+      # Clear out the garbage
+      PostsController.instance_variable_set "@responds_within", nil
     end
   end
 
@@ -238,28 +245,33 @@ describe ResponderController::ClassMethods do
       PostsController.children_of 'accounts/user'.to_sym
     end
 
-    it "creates a scope filtering by the parent model's foreign key as passed in params" do
+    it "creates a scope filtering by the parent's key as passed in params" do
       PostsController.children_of 'accounts/user'
       controller = PostsController.new
       controller.params[:user_id] = :the_user_id
 
-      user_query = mock("user-restricted query")
-      @query.should_receive(:where).with(:user_id => :the_user_id).and_return(user_query)
+      @query.should_receive(:where).
+        with(:user_id => :the_user_id).
+        and_return(user_query = mock("user-restricted query"))
+
       controller.scope(@query).should == user_query
     end
 
-    it "adds a responds_within context, of the parent modules followed by the parent itself" do
+    it "adds a responds_within context, of the parent with its modules" do
       PostsController.children_of 'accounts/user'
       controller = PostsController.new
       controller.params[:user_id] = :the_user_id
 
-      Accounts::User.should_receive(:find).with(:the_user_id).and_return(user = mock("the user"))
+      Accounts::User.should_receive(:find).with(:the_user_id).
+        and_return(user = mock("the user"))
 
-      controller.responder_context(:argument).should == [:accounts, user, :argument]
+      controller.responder_context(:argument).should == [
+          :accounts, user, :argument]
     end
 
     after :each do
-      PostsController.instance_variable_set "@responds_within", nil # clear out the garbage
+      # Clear out the garbage
+      PostsController.instance_variable_set "@responds_within", nil
       PostsController.scopes.clear
     end
   end
