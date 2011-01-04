@@ -3,6 +3,8 @@
 * #find_model will call #from_param(params['id']) instead of #find on the
   query returned by #find_models if that query responds to #from_param.
 
+* Enable color in rspec
+
 *ResponderController 0.3.0*
 
 * Broke modules out into separate files.
